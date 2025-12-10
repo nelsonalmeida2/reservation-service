@@ -1,0 +1,79 @@
+server:
+  port: ${PORT}
+
+spring:
+  application:
+    name: ${APPLICATION_NAME}
+  kafka:
+    # -----------------------------------------------------------------
+    # Propriedade Central - Usada por Producer, Consumer e Admin
+    # -----------------------------------------------------------------
+    bootstrap-servers: kafka:9092
+
+    # -----------------------------------------------------------------
+    # Bloco do Producer
+    # -----------------------------------------------------------------
+    producer:
+      # Não precisa de 'bootstrap-servers' aqui, usa o de cima
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+    # -----------------------------------------------------------------
+    # Bloco do Consumer
+    # -----------------------------------------------------------------
+    consumer:
+      # Não precisa de 'bootstrap-servers' aqui, usa o de cima
+      group-id: product-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        spring.json.use.type.headers: false
+        spring.json.value.default.type: java.lang.String
+    listener:
+      missing-topics-fatal: false
+      ack-mode: MANUAL_IMMEDIATE
+
+
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_DB}:5432/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 10000
+        loggerLevel: FULL
+  hystrix:
+    enabled: false
+
+logging:
+  level:
+    pt.ulusofona.cd.store.shared.client: DEBUG
+    feign: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
