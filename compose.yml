@@ -1,5 +1,5 @@
 services:
-  product_db:
+  reservation_db:
     image: postgres:17
     restart: always
     env_file: ".env"
@@ -11,12 +11,12 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - store-network
+      - restaurant-network
 
   flyway:
     image: flyway/flyway:11.12
     depends_on:
-      product_db:
+      reservation_db:
         condition: service_healthy
     volumes:
       - ./migrations:/flyway/sql
@@ -27,43 +27,43 @@ services:
       migrate
     env_file: ".env"
     networks:
-      - store-network
+      - restaurant-network
 
-  product-service:
+  reservation-service:
     build:
       context: .
       dockerfile: Dockerfile
     depends_on:
-      product_db:
+      reservation_db:
         condition: service_healthy
     env_file: ".env"
     ports:
-      - "8081:8081"
+      - "8082:8082"
       - "9090:9090"
     volumes:
       - ./src:/app/src
       - ~/.m2:/root/.m2
     networks:
-      - store-network
+      - restaurant-network
 
   pgadmin:
     image: dpage/pgadmin4:9.8.0
     restart: always
     env_file: ".env"
     depends_on:
-      product_db:
+      reservation_db:
         condition: service_healthy
     ports:
       - "7777:80"
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     networks:
-      - store-network
+      - restaurant-network
 
 volumes:
   db_data:
   pgadmin_data:
 
 networks:
-  store-network:
+  restaurant-network:
     external: true

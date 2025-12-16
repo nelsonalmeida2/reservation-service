@@ -8,11 +8,11 @@
         <relativePath/>
     </parent>
     <groupId>pt.ulusofona.cd</groupId>
-    <artifactId>product-service</artifactId>
+    <artifactId>reservation-service</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
-    <name>Product Service</name>
-    <description>Product management microservice</description>
+    <name>Reservation Service</name>
+    <description>Reservation management microservice</description>
     <properties>
         <java.version>23</java.version>
         <spring-cloud.version>2024.0.0</spring-cloud.version>
@@ -164,7 +164,7 @@
                 <artifactId>protobuf-maven-plugin</artifactId>
                 <version>0.6.1</version>
                 <configuration>
-                    <protoSourceRoot>${project.basedir}/src/main/java/pt/ulusofona/cd/store/proto</protoSourceRoot>
+                    <protoSourceRoot>${project.basedir}/src/main/java/pt/ulusofona/cd/reservation/proto</protoSourceRoot>
                     <protocArtifact>com.google.protobuf:protoc:3.25.1:exe:${os.detected.classifier}</protocArtifact>
                     <pluginId>grpc-java</pluginId>
                     <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.60.1:exe:${os.detected.classifier}</pluginArtifact>

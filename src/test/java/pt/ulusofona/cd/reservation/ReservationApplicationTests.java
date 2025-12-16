@@ -1,10 +1,10 @@
-package pt.ulusofona.cd.store;
+package pt.ulusofona.cd.reservation;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class StoreApplicationTests {
+class ReservationApplicationTests {
 
     @Test
     void contextLoads() {
