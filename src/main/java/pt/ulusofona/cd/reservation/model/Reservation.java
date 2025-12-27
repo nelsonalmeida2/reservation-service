@@ -39,9 +39,14 @@ public class Reservation {
     @Column(name = "party_size", nullable = false)
     private int partySize;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 20)
-    private ReservationStatus status;
+    @Column(name = "is_confirmed", nullable = false)
+    private boolean isConfirmed;
+
+    @Column(name = "is_cancelled", nullable = false)
+    private boolean isCancelled;
+
+    @Column(name= "is_pending", nullable = false)
+    private  boolean isPending;
 
     @NotNull
     @Column(name = "scheduled_at", nullable = false)
