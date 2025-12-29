@@ -9,8 +9,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReservationCancelledEvent {
+public class ReservationConfirmedEvent {
     private UUID reservationId;
-    private UUID restaurantId;
     private String customerEmail;
 }

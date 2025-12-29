@@ -77,3 +77,9 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
+reservation:
+  events:
+    reservation-created: reservation.created
+    reservation-confirmed: reservation.confirmed
+    reservation-cancelled: reservation.cancelled
+
