@@ -59,7 +59,7 @@ feign:
 
 logging:
   level:
-    pt.ulusofona.cd.store.shared.client: DEBUG
+    pt.ulusofona.cd.reservation: DEBUG
     feign: DEBUG
 
 management:

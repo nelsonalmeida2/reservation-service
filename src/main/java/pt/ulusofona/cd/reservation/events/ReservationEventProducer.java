@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import pt.ulusofona.cd.reservation.dto.MessageEnvelope;
 import pt.ulusofona.cd.reservation.dto.ReservationCancelledEvent;
 import pt.ulusofona.cd.reservation.dto.ReservationConfirmedEvent;
-import pt.ulusofona.cd.reservation.events.ReservationCreatedEvent;
+import pt.ulusofona.cd.reservation.dto.ReservationCreatedEvent;
 
 import java.time.Instant;
 import java.util.UUID;

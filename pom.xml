@@ -14,7 +14,7 @@
     <name>Reservation Service</name>
     <description>Reservation management microservice</description>
     <properties>
-        <java.version>23</java.version>
+        <java.version>24</java.version>
         <spring-cloud.version>2024.0.0</spring-cloud.version>
         <openfeign.version>4.1.0</openfeign.version>
         <spring-grpc.version>0.12.0</spring-grpc.version>

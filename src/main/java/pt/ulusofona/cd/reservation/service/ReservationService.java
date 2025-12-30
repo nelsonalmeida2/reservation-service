@@ -7,7 +7,7 @@ import pt.ulusofona.cd.reservation.client.RestaurantClient;
 import pt.ulusofona.cd.reservation.dto.ReservationCancelledEvent;
 import pt.ulusofona.cd.reservation.dto.ReservationConfirmedEvent;
 import pt.ulusofona.cd.reservation.dto.ReservationRequest;
-import pt.ulusofona.cd.reservation.events.ReservationCreatedEvent;
+import pt.ulusofona.cd.reservation.dto.ReservationCreatedEvent;
 import pt.ulusofona.cd.reservation.events.ReservationEventProducer;
 import pt.ulusofona.cd.reservation.exception.ReservationNotFoundException;
 import pt.ulusofona.cd.reservation.mapper.ReservationMapper;
