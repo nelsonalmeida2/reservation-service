@@ -54,7 +54,7 @@ services:
       reservation_db:
         condition: service_healthy
     ports:
-      - "7777:80"
+      - "7778:80"
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     networks:

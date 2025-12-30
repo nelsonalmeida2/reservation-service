@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: ${APPLICATION_NAME}
+    name: ${APPLICATION_NAME:reservation-service}
   kafka:
     # -----------------------------------------------------------------
     # Propriedade Central - Usada por Producer, Consumer e Admin
