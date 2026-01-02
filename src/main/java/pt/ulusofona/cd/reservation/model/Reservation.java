@@ -46,7 +46,7 @@ public class Reservation {
     private boolean isCancelled;
 
     @Column(name= "is_pending", nullable = false)
-    private  boolean isPending;
+    private boolean isPending = true;
 
     @NotNull
     @Column(name = "scheduled_at", nullable = false)
@@ -63,6 +63,4 @@ public class Reservation {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-
 }

@@ -5,38 +5,22 @@ spring:
   application:
     name: ${APPLICATION_NAME:reservation-service}
   kafka:
-    # -----------------------------------------------------------------
-    # Propriedade Central - Usada por Producer, Consumer e Admin
-    # -----------------------------------------------------------------
     bootstrap-servers: kafka:9092
-
-    # -----------------------------------------------------------------
-    # Bloco do Producer
-    # -----------------------------------------------------------------
     producer:
-      # Não precisa de 'bootstrap-servers' aqui, usa o de cima
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-
-    # -----------------------------------------------------------------
-    # Bloco do Consumer
-    # -----------------------------------------------------------------
     consumer:
-      # Não precisa de 'bootstrap-servers' aqui, usa o de cima
       group-id: reservation-service-group
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       properties:
         spring.json.trusted.packages: "*"
         spring.json.use.type.headers: false
-        spring.json.value.default.type: java.lang.String
     listener:
       missing-topics-fatal: false
-      ack-mode: MANUAL_IMMEDIATE
-
 
   datasource:
-    url: jdbc:postgresql://${POSTGRES_DB}:5432/${POSTGRES_DB}
+    url: jdbc:postgresql://reservation_db:5432/${POSTGRES_DB}
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
@@ -79,7 +63,6 @@ springdoc:
 
 reservation:
   events:
-    reservation-created: reservation.created
-    reservation-confirmed: reservation.confirmed
-    reservation-cancelled: reservation.cancelled
-
+    reservation-created: reservation-created-events-topic
+    reservation-confirmed: reservation-confirmed-events-topic
+    reservation-cancelled: reservation-cancelled-events-topic

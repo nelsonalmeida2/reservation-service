@@ -6,9 +6,11 @@ import org.springframework.transaction.annotation.Transactional;
 import pt.ulusofona.cd.reservation.client.RestaurantClient;
 import pt.ulusofona.cd.reservation.dto.ReservationCancelledEvent;
 import pt.ulusofona.cd.reservation.dto.ReservationConfirmedEvent;
-import pt.ulusofona.cd.reservation.dto.ReservationRequest;
 import pt.ulusofona.cd.reservation.dto.ReservationCreatedEvent;
-import pt.ulusofona.cd.reservation.events.ReservationEventProducer;
+import pt.ulusofona.cd.reservation.dto.ReservationRequest;
+import pt.ulusofona.cd.reservation.events.ReservationCancelledProducer;
+import pt.ulusofona.cd.reservation.events.ReservationConfirmedProducer;
+import pt.ulusofona.cd.reservation.events.ReservationCreatedProducer;
 import pt.ulusofona.cd.reservation.exception.ReservationNotFoundException;
 import pt.ulusofona.cd.reservation.mapper.ReservationMapper;
 import pt.ulusofona.cd.reservation.model.Reservation;
@@ -24,14 +26,18 @@ public class ReservationService {
 
     private final ReservationRepository reservationRepository;
     private final RestaurantClient restaurantClient;
-    private final ReservationEventProducer eventProducer;
+
+    // Injeção dos Producers separados
+    private final ReservationCreatedProducer createdProducer;
+    private final ReservationConfirmedProducer confirmedProducer;
+    private final ReservationCancelledProducer cancelledProducer;
 
     @Transactional
     public Reservation createReservation(ReservationRequest request) {
 
+        // 1. Verificar se o cliente já tem reserva para aquela hora (evitar duplicados)
         List<Reservation> existingReservations = reservationRepository
                 .findByCustomerEmailAndScheduledAt(request.getCustomerEmail(), request.getScheduledAt());
-
 
         boolean hasActiveReservation = existingReservations.stream()
                 .anyMatch(r -> !r.isCancelled());
@@ -40,7 +46,7 @@ public class ReservationService {
             throw new IllegalArgumentException("O cliente já possui uma reserva ativa para esta hora.");
         }
 
-
+        // 2. Verificar disponibilidade no Restaurant Service (Chamada Síncrona via Feign)
         try {
             boolean isAvailable = restaurantClient.checkAvailability(
                     request.getRestaurantId(),
@@ -53,15 +59,16 @@ public class ReservationService {
         } catch (IllegalArgumentException e) {
             throw e;
         } catch (Exception e) {
+            // Se o serviço de restaurante estiver em baixo, não deixamos criar reserva
             throw new IllegalStateException("Serviço de restaurantes indisponível.");
         }
 
-
+        // 3. Guardar na BD local (Estado Pendente)
         Reservation reservation = ReservationMapper.toEntity(request);
         Reservation savedReservation = reservationRepository.save(reservation);
 
-
-        eventProducer.sendReservationCreated(new ReservationCreatedEvent(
+        // 4. Emitir evento de CRIAÇÃO
+        createdProducer.send(new ReservationCreatedEvent(
                 savedReservation.getId(),
                 savedReservation.getRestaurantId(),
                 savedReservation.getCustomerEmail()
@@ -75,16 +82,22 @@ public class ReservationService {
         Reservation reservation = getReservationById(reservationId);
 
         if (!reservation.isPending()) {
-            throw new IllegalStateException("Apenas reservas pendentes podem ser confirmadas...");
+            throw new IllegalStateException("Apenas reservas pendentes podem ser confirmadas.");
         }
 
+        // Atualizar estado
         reservation.setConfirmed(true);
         reservation.setPending(false);
         reservation.setCancelled(false);
         reservationRepository.save(reservation);
 
-        eventProducer.sendReservationConfirmed(new ReservationConfirmedEvent(
+        // 5. Emitir evento de CONFIRMAÇÃO
+        // Nota: Enviamos 'scheduledAt' porque a BD não tem 'slotId'
+        confirmedProducer.send(new ReservationConfirmedEvent(
                 reservation.getId(),
+                reservation.getRestaurantId(),
+                reservation.getScheduledAt(),
+                reservation.getPartySize(),
                 reservation.getCustomerEmail()
         ));
     }
@@ -94,34 +107,26 @@ public class ReservationService {
         Reservation reservation = getReservationById(reservationId);
 
         if (reservation.isCancelled()) {
-            return;
+            return; // Já está cancelada, não faz nada
         }
 
-        if (reservation.isConfirmed()) {
-            try {
-                restaurantClient.releaseTable(
-                        reservation.getRestaurantId(),
-                        reservation.getScheduledAt(),
-                        reservation.getPartySize()
-                );
-            } catch (Exception e) {
-                System.err.println("Erro ao libertar mesa no restaurante: " + e.getMessage());
-            }
-        }
-
+        // Atualizar estado
         reservation.setCancelled(true);
         reservation.setPending(false);
         reservation.setConfirmed(false);
         reservationRepository.save(reservation);
 
-        eventProducer.sendReservationCancelled(new ReservationCancelledEvent(
+        // 6. Emitir evento de CANCELAMENTO
+        cancelledProducer.send(new ReservationCancelledEvent(
                 reservation.getId(),
                 reservation.getRestaurantId(),
-                reservation.getCustomerEmail()
+                reservation.getScheduledAt(),
+                reservation.getPartySize(),
+                reservation.getCustomerEmail(),
+                "Cancelado pelo cliente",
+                LocalDateTime.now()
         ));
     }
-
-
 
     public Reservation getReservationById(UUID id) {
         return reservationRepository.findById(id)
@@ -131,7 +136,6 @@ public class ReservationService {
     public List<Reservation> getReservationsByClient(String email) {
         return reservationRepository.findByCustomerEmail(email);
     }
-
 
     public List<Reservation> getRestaurantSchedule(UUID restaurantId, LocalDateTime date) {
         LocalDateTime startOfDay = date.toLocalDate().atStartOfDay();
