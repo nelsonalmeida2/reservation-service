@@ -23,7 +23,6 @@ public class ReservationController {
 
     private final ReservationService reservationService;
 
-
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(@Valid @RequestBody ReservationRequest request) {
         Reservation created = reservationService.createReservation(request);
@@ -32,20 +31,17 @@ public class ReservationController {
                 .body(ReservationMapper.toResponse(created));
     }
 
-
     @PostMapping("/{id}/cancel")
     public ResponseEntity<Void> cancelReservation(@PathVariable UUID id) {
         reservationService.cancelReservation(id);
         return ResponseEntity.ok().build();
     }
 
-
     @PostMapping("/{id}/confirm")
     public ResponseEntity<Void> confirmReservation(@PathVariable UUID id) {
         reservationService.confirmReservation(id);
         return ResponseEntity.ok().build();
     }
-
 
     @GetMapping("/{id}")
     public ResponseEntity<ReservationResponse> getReservationById(@PathVariable UUID id) {

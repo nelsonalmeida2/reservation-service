@@ -26,8 +26,6 @@ public class ReservationService {
 
     private final ReservationRepository reservationRepository;
     private final RestaurantClient restaurantClient;
-
-    // Injeção dos Producers separados
     private final ReservationCreatedProducer createdProducer;
     private final ReservationConfirmedProducer confirmedProducer;
     private final ReservationCancelledProducer cancelledProducer;
@@ -35,7 +33,6 @@ public class ReservationService {
     @Transactional
     public Reservation createReservation(ReservationRequest request) {
 
-        // 1. Verificar se o cliente já tem reserva para aquela hora (evitar duplicados)
         List<Reservation> existingReservations = reservationRepository
                 .findByCustomerEmailAndScheduledAt(request.getCustomerEmail(), request.getScheduledAt());
 
@@ -46,7 +43,6 @@ public class ReservationService {
             throw new IllegalArgumentException("O cliente já possui uma reserva ativa para esta hora.");
         }
 
-        // 2. Verificar disponibilidade no Restaurant Service (Chamada Síncrona via Feign)
         try {
             boolean isAvailable = restaurantClient.checkAvailability(
                     request.getRestaurantId(),
@@ -59,15 +55,12 @@ public class ReservationService {
         } catch (IllegalArgumentException e) {
             throw e;
         } catch (Exception e) {
-            // Se o serviço de restaurante estiver em baixo, não deixamos criar reserva
             throw new IllegalStateException("Serviço de restaurantes indisponível.");
         }
 
-        // 3. Guardar na BD local (Estado Pendente)
         Reservation reservation = ReservationMapper.toEntity(request);
         Reservation savedReservation = reservationRepository.save(reservation);
 
-        // 4. Emitir evento de CRIAÇÃO
         createdProducer.send(new ReservationCreatedEvent(
                 savedReservation.getId(),
                 savedReservation.getRestaurantId(),
@@ -85,14 +78,11 @@ public class ReservationService {
             throw new IllegalStateException("Apenas reservas pendentes podem ser confirmadas.");
         }
 
-        // Atualizar estado
         reservation.setConfirmed(true);
         reservation.setPending(false);
         reservation.setCancelled(false);
         reservationRepository.save(reservation);
 
-        // 5. Emitir evento de CONFIRMAÇÃO
-        // Nota: Enviamos 'scheduledAt' porque a BD não tem 'slotId'
         confirmedProducer.send(new ReservationConfirmedEvent(
                 reservation.getId(),
                 reservation.getRestaurantId(),
@@ -107,16 +97,14 @@ public class ReservationService {
         Reservation reservation = getReservationById(reservationId);
 
         if (reservation.isCancelled()) {
-            return; // Já está cancelada, não faz nada
+            return;
         }
 
-        // Atualizar estado
         reservation.setCancelled(true);
         reservation.setPending(false);
         reservation.setConfirmed(false);
         reservationRepository.save(reservation);
 
-        // 6. Emitir evento de CANCELAMENTO
         cancelledProducer.send(new ReservationCancelledEvent(
                 reservation.getId(),
                 reservation.getRestaurantId(),
