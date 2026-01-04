@@ -105,6 +105,18 @@ public class ReservationService {
         reservation.setConfirmed(false);
         reservationRepository.save(reservation);
 
+
+        try {
+            restaurantClient.releaseSeats(
+                    reservation.getRestaurantId(),
+                    reservation.getScheduledAt(),
+                    reservation.getPartySize()
+            );
+        } catch (Exception e) {
+            System.err.println("Erro ao libertar lugares no restaurante: " + e.getMessage());
+        }
+
+
         cancelledProducer.send(new ReservationCancelledEvent(
                 reservation.getId(),
                 reservation.getRestaurantId(),

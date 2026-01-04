@@ -20,4 +20,11 @@ public interface RestaurantClient {
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date,
             @RequestParam("partySize") int partySize 
     );
+
+    @PostMapping("/api/v1/restaurants/{restaurantId}/availability/release")
+    void releaseSeats(
+            @PathVariable("restaurantId") UUID restaurantId,
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date,
+            @RequestParam("partySize") int partySize
+    );
 }
