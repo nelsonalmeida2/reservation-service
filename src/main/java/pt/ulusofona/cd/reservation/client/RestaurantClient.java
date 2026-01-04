@@ -18,6 +18,6 @@ public interface RestaurantClient {
     boolean checkAvailability(
             @PathVariable("restaurantId") UUID restaurantId,
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date,
-            @RequestParam("partySize") int partySize // Mantemos o nome da rede "partySize"
+            @RequestParam("partySize") int partySize 
     );
 }
