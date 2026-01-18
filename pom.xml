@@ -7,7 +7,7 @@
         <version>3.4.4</version>
         <relativePath/>
     </parent>
-    <groupId>pt.ulusofona.cd</groupId>
+    <groupId>pt.nelsonalmeida</groupId>
     <artifactId>reservation-service</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
@@ -164,7 +164,7 @@
                 <artifactId>protobuf-maven-plugin</artifactId>
                 <version>0.6.1</version>
                 <configuration>
-                    <protoSourceRoot>${project.basedir}/src/main/java/pt/ulusofona/cd/reservation/proto</protoSourceRoot>
+                    <protoSourceRoot>src/main/java/pt/nelsonalmeida/reservation/proto</protoSourceRoot>
                     <protocArtifact>com.google.protobuf:protoc:3.25.1:exe:${os.detected.classifier}</protocArtifact>
                     <pluginId>grpc-java</pluginId>
                     <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.60.1:exe:${os.detected.classifier}</pluginArtifact>
