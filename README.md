@@ -6,6 +6,20 @@ It handles event-driven updates through **Apache Kafka**.
 
 ---
 
+## 🌐 Microservices Ecosystem
+
+This service is part of a larger **Food Delivery System**. You can explore the other components of the architecture below:
+
+| Service | Responsibility | Repository |
+| :--- | :--- | :--- |
+| **🍴 Restaurant Service** | Manages restaurant profiles, menus, and slots. | [View Repo](https://github.com/nelsonalmeida2/restaurant-service) |
+| **📅 Reservation Service** | Handles table bookings and real-time availability. | [View Repo](https://github.com/nelsonalmeida2/reservation-service) |
+| **💳 Payment Service** | Processes transactions and manages payment states. | [View Repo](https://github.com/nelsonalmeida2/payment-service) |
+| **🔔 Notification Service** | Dispatches Email/SMS notifications via Kafka events. | [View Repo](https://github.com/nelsonalmeida2/notification-service) |
+| **🎡 Shared Infra** | Central Kafka broker and infrastructure setup. | [View Repo](https://github.com/nelsonalmeida2/food-delivery-infra) |
+
+---
+
 ## 🛠️ Tech Stack
 
 - **Java 24**
